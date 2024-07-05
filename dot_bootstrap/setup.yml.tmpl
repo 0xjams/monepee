@@ -1,0 +1,38 @@
+- name: Machine setup
+  hosts: all
+  become: true
+  connection: local
+  gather_facts: true
+  vars:
+    lvim_branch: "{{ .lvim_branch }}"
+    lvim_url: "{{ .lvim_url }}"
+
+  tasks:
+
+    - name: Include brew_packages.yml
+      include_vars: brew_packages.yml
+    - name: Include kali_packages.yml
+      include_vars: kali_packages.yml
+    - name: Include nix_packages.yml
+      include_vars: nix_packages.yml
+    - name: Include pipx_packages.yml
+      include_vars: pipx_packages.yml
+
+    - name: Check if Homebrew is installed on Linux
+      block: 
+      - name: Checking
+        shell:
+           cmd: "type /home/linuxbrew/.linuxbrew/bin/brew"
+        register: brew_installed
+        check_mode: false
+        changed_when: false
+        when: "'Linux' in ansible_facts['system']"
+      rescue:
+        - name: No homebrew
+          debug:
+            msg: Homebrew is not installed
+
+    - name: Include Linux tasks
+      ansible.builtin.include_tasks: "linux.yml"
+      when:
+       - "'Linux' in ansible_facts['system']"

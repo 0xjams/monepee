@@ -1,0 +1,86 @@
+{{ if eq .chezmoi.os "android" }}#!/data/data/com.termux/files/usr/bin/bash
+test -f ~/.chezmoi_only_copy_files && echo "Only copying files, skipping installation" && exit 0
+yes | pkg upgrade 
+yes | pkg install yq
+yq eval '.packages[]' ~/.bootstrap/android_packages.yml | xargs -I {} sh -c "yes | pkg install {}"
+chsh -s zsh
+git clone https://github.com/rendiix/termux-adb-fastboot.git
+cd termux-adb-fastboot
+bash install.sh
+test -f ~/.skip_nethunter && echo "Only copying files, skipping nethumter" && exit 0
+termux-setup-storage
+wget -O install-nethunter-termux https://offs.ec/2MceZWr
+chmod +x install-nethunter-termux
+/data/data/com.termux/files/usr/bin/bash ./install-nethunter-termux
+{{ else }}#!/bin/bash
+
+install_debian_common() {
+    export DEBIAN_FRONTEND=noninteractive
+    echo "Running common installation steps"
+    sudo apt-get update
+    sudo apt-get install -y git ansible build-essential procps curl file protobuf-compiler
+    ansible-galaxy collection install community.general
+
+    # Check for x86_64 architecture for Homebrew
+    if [ "$(uname -m)" = "x86_64" ]; then
+        echo "The system architecture is x86_64."
+        if ! command -v brew &>/dev/null; then
+            echo "Installing brew"
+            yes "" | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+            echo "PATH=$PATH:/home/linuxbrew/.linuxbrew/bin" | sudo tee /etc/profile.d/99-brew-in-path.sh
+        else
+            echo "Brew is already present on the system"
+        fi
+    else
+        # Installing nix
+        nix_directory="$HOME/.nix-profile/bin"
+
+        # Check if the directory does not exist
+        if [ ! -d "$nix_directory" ]; then
+            # The directory does not exist, run the Nix installation command
+            sh <(curl -L https://nixos.org/nix/install) --no-daemon
+        else
+            echo "Nix is already installed at $nix_directory"
+        fi
+    fi
+}
+
+# Example of how to support Ubuntu
+# install_on_ubuntu() {
+#     echo "Installing on Ubuntu"
+#     export DEBIAN_FRONTEND=noninteractive
+#     sudo apt-get install -y zsh  # Specific additional package for Ubuntu
+#     echo "Changing shell"
+#     TMP_CURRENT_USER=$(whoami)
+#     sudo chsh -s $(which zsh) $TMP_CURRENT_USER
+#     install_debian_common
+# }
+
+install_on_kali() {
+    echo "Installing on Kali"
+    install_debian_common
+}
+
+OS="$(uname -s)"
+case "${OS}" in
+    Linux*)
+        
+        if grep -q "Kali" "/etc/os-release"; then
+            install_on_kali
+        # Example of also supporting Ubuntu
+        # elif [ -f /etc/lsb-release ]; then
+        #    install_on_ubuntu
+        else
+            echo "Unsupported Linux distribution"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Unsupported operating system: ${OS}"
+        exit 1
+        ;;
+esac
+
+echo "Running ansible playbook"
+ansible-playbook -i 127.0.0.1, ~/.bootstrap/setup.yml --ask-become-pass
+{{ end }}

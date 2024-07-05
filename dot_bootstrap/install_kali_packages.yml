@@ -1,0 +1,4 @@
+- name: Install packages on Linux
+  apt:
+    name: "{{ item }}"
+  loop: "{{ kali_packages }}"

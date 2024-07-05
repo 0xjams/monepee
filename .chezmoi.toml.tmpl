@@ -1,0 +1,4 @@
+{{- $gitHubUsername := promptStringOnce . "gitHubUsername" "What's your GitHub id to obtain public keys for .ssh/authorized_keys" "none" -}}
+
+[data]
+    gitHubUsername = {{ $gitHubUsername | quote }}

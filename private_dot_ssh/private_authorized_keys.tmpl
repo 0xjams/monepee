@@ -1,0 +1,5 @@
+{{ if not (contains .gitHubUsername "none") -}}
+  {{ range gitHubKeys .gitHubUsername -}}
+    {{ .Key }}
+  {{ end -}}
+{{ end -}}

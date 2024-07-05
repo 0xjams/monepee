@@ -1,0 +1,4 @@
+brew_packages:
+  {{- range .brew_packages }}
+  - {{ . }}
+  {{- end }}

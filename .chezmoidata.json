@@ -1,0 +1,10 @@
+{
+    "font_url": "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip",
+    "lvim_branch": "release-1.4/neovim-0.9",
+    "lvim_url": "https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh",
+    "android_packages": ["wget","rbw","neovim","just","tmux","lsd","atuin","fzf","imagemagick","ripgrep","zsh","git","python","golang","wget","bat"],
+    "brew_packages": ["tmux","git","nvim","atuin","lsd","zoxide","bat","fzf","imagemagick","node@20","python","make","lazygit","rbw","just","pipx"],
+    "kali_packages": ["autorecon","peass","remmina","flameshot"],
+    "nix_packages": ["atuin","lsd","zoxide","ripgrep","bat","rbw","just","neovim","cargo","nodejs_20","imagemagick","lazygit"],
+    "pipx_packages": ["updog","pwntools","impacket"]
+}

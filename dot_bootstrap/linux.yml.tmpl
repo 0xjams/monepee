@@ -1,0 +1,84 @@
+- name: Install packages on Linux with Homebrew (if available)
+  include_tasks: install_brew_packages.yml
+  when:
+    - "'Linux' in ansible_facts['system']"
+    - brew_installed.rc == 0
+
+- name: Install arm packages when brew is not available
+  block:
+    - name: Install Nix packages
+      include_tasks: install_nix_packages.yml
+  when:
+    - "'Linux' in ansible_facts['system']"
+    - brew_installed.rc != 0
+
+- name: Include Kali packages
+  ansible.builtin.include_tasks: install_kali_packages.yml
+  when:
+    - "'Linux' in ansible_facts['system']"
+
+- name: Include pipx packages
+  ansible.builtin.include_tasks: install_pipx_packages.yml
+  when:
+    - "'Linux' in ansible_facts['system']"
+
+- name: Ensure the fonts directory exists
+  ansible.builtin.file:
+    path: ~/.fonts
+    state: directory
+    mode: '0755'
+  become: false
+
+- name: Unarchive JetBrains Mono NF
+  ansible.builtin.unarchive:
+    src: "{{ .font_url }}"
+    dest: ~/.fonts
+    remote_src: yes
+  become: false
+
+- name: Check if nvim and lvim are installed
+  block:
+    - name: Checking if nvim is installed
+      shell: 
+        cmd: "type nvim"
+      register: nvim_installed
+      check_mode: false
+      changed_when: false
+      environment:
+        PATH: {{`"{{ ansible_env.PATH }}:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/home/{{ ansible_env.SUDO_USER }}/.nix-profile/bin:{{ ansible_env.HOME }}/.nix-profile/bin"`}}
+
+    - name: Create symlink for nvim
+      ansible.builtin.file:
+        src:  {{`"/home/{{ ansible_env.SUDO_USER }}/.nix-profile/bin/nvim"`}}
+        dest: "/usr/local/bin/nvim"
+        state: link
+        force: yes
+      become: yes
+      when:
+        - "'Linux' in ansible_facts['system']"
+        - brew_installed.rc != 0
+
+    - name: Checking if lvim is installed
+      shell:
+        cmd: "type lvim"
+      register: lvim_installed
+      check_mode: false
+      changed_when: false
+      ignore_errors: true
+      environment:
+        PATH: {{`"{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/home/{{ ansible_env.SUDO_USER }}/.local/bin:/home/{{ ansible_env.SUDO_USER }}/.nix-profile/bin:{{ ansible_env.HOME }}/.nix-profile/bin"`}}
+      
+    - name: Installing lvim
+      shell: {{`"/bin/bash <(curl -s {{ lvim_url }}) --no-install-dependencies"`}}
+      args:
+        executable: /bin/bash
+      become: false
+      when: lvim_installed.rc != 0 and nvim_installed.rc == 0
+      environment:
+        LV_BRANCH: {{`"{{ lvim_branch }}"`}}
+        PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/linuxbrew/.linuxbrew/bin" 
+
+  rescue:
+    - name: Installation status
+      debug:
+        msg:  {{`"{{ 'nvim is not installed' if nvim_installed.rc != 0 else ('lvim is already installed' if lvim_installed.rc == 0 else 'Installing lvim') }}"`}}

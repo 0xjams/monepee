@@ -1,0 +1,4 @@
+nix_packages:
+  {{- range .nix_packages }}
+  - {{ . }}
+  {{- end }}
