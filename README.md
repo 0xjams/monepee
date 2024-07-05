@@ -18,9 +18,6 @@ The previous commands  will install chezmoi in __/usr/local/bin/chezmoi__
 
 After that, we can proceed to run the following command to install everything:
 
-https://github.com/0xjams/monepee
-https://raw.githubusercontent.com/0xjams/monepee/main/install_linux.sh
-
 ```bash
 chezmoi init --apply https://github.com/0xjams/monepee
 ```
@@ -29,7 +26,7 @@ chezmoi init --apply https://github.com/0xjams/monepee
 Here's also a oneliner to get it running
 
 ```bash
-sudo apt install curl && sh -c "$(curl -fsLS https://raw.githubusercontent.com/0xjams/monepee/main/install_linux.sh"
+sudo apt install curl && sh -c "$(curl -fsLS https://raw.githubusercontent.com/0xjams/monepee/main/install_linux.sh)"
 ```
 > Using a oneliner in Linux
 
