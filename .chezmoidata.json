@@ -5,6 +5,6 @@
     "android_packages": ["wget","rbw","neovim","just","tmux","lsd","atuin","fzf","imagemagick","ripgrep","zsh","git","python","golang","wget","bat"],
     "brew_packages": ["tmux","git","nvim","atuin","lsd","zoxide","bat","fzf","imagemagick","node@20","python","make","lazygit","rbw","just","pipx"],
     "kali_packages": ["autorecon","peass","remmina","flameshot"],
-    "nix_packages": ["atuin","lsd","zoxide","ripgrep","bat","rbw","just","neovim","cargo","nodejs_20","imagemagick","lazygit"],
+    "nix_packages": ["atuin","lsd","zoxide","ripgrep","bat","rbw","just","neovim","cargo","nodejs_20","imagemagick","lazygit","pipx"],
     "pipx_packages": ["updog","pwntools","impacket"]
 }

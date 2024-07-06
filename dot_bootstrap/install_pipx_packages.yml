@@ -5,6 +5,6 @@
   args:
     executable: /bin/bash
   environment:
-    PATH: "{{ ansible_env.PATH }}:/home/{{ lookup('env', 'USER') }}/.local/bin:/home/linuxbrew/.linuxbrew/bin"
+    PATH: "{{ ansible_env.PATH }}:/home/{{ lookup('env', 'USER') }}/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/{{ ansible_env.SUDO_USER }}/.nix-profile/bin:{{ ansible_env.HOME }}/.nix-profile/bin"
     PIPX_BIN_DIR: "/home/{{ lookup('env', 'USER') }}/.local/bin"
     PIPX_HOME: "/home/{{ lookup('env', 'USER') }}/.local/pipx"
